@@ -3,6 +3,7 @@ import sys
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from signals import sin, rectangle, triangle, sawtooth, invsawtooth, pulse
+from dft import calculate_dft_mgn,calculate_dft_phase
 
 class OscilloscopeGUI(QMainWindow):
     def __init__ (self):
@@ -30,6 +31,12 @@ class OscilloscopeGUI(QMainWindow):
         self.canvas2=FigureCanvas(self.fig2)
         self.ax2 = self.fig2.add_subplot(111)
         self.spectrum_layout.addWidget(self.canvas2)
+
+        #Spectrum Plot
+        self.fig3=Figure(figsize=(5, 4), dpi=100)
+        self.canvas3=FigureCanvas(self.fig3)
+        self.ax3 = self.fig3.add_subplot(111)
+        self.spectrum_layout.addWidget(self.canvas3)
 
         self.signaltype=QComboBox()
         signals=["Sinusoid","Rectangle","Triangle","Sawtooth","Inverse Sawtooth", "Pulse"]
@@ -110,6 +117,8 @@ class OscilloscopeGUI(QMainWindow):
 
     def update_plot(self):
         self.ax.clear()
+        self.ax2.clear()
+        self.ax3.clear()
         type = self.signaltype.currentText()
 
         a = self.A.value()
@@ -126,25 +135,51 @@ class OscilloscopeGUI(QMainWindow):
 
 
         if(type=="Sinusoid"):
-            t, y = sin(a, b, phi, start, stop, fs, f)
+            t, x = sin(a, b, phi, start, stop, fs, f)
+            f, X = calculate_dft_mgn(t,x)
+            f,pha = calculate_dft_phase(t,x)
         elif(type=="Rectangle"):
-            t, y = rectangle(a,b,phi,duty,start,stop,fs,f)
+            t, x = rectangle(a,b,phi,duty,start,stop,fs,f)
+            f, X = calculate_dft_mgn(t,x)
+            f,pha = calculate_dft_phase(t,x)
         elif(type=="Triangle"):
-            t, y = triangle(a,b,phi,start,stop,fs,f)
+            t, x = triangle(a,b,phi,start,stop,fs,f)
+            f, X = calculate_dft_mgn(t,x)
+            f,pha = calculate_dft_phase(t,x)
         elif(type=="Sawtooth"):
-            t, y = sawtooth(a,b,phi,start,stop,fs,f)
+            t, x = sawtooth(a,b,phi,start,stop,fs,f)
+            f, X = calculate_dft_mgn(t,x)
+            f,pha = calculate_dft_phase(t,x)
         elif(type=="Inverse Sawtooth"):
-            t, y = invsawtooth(a,b,phi,start,stop,fs,f)
+            t, x = invsawtooth(a,b,phi,start,stop,fs,f)
+            f, X = calculate_dft_mgn(t,x)
+            f,pha = calculate_dft_phase(t,x)
         elif(type=="Pulse"):
-            t, y = pulse(a,b,start_pulse,width,start,stop,fs)
+            t, x = pulse(a,b,start_pulse,width,start,stop,fs)
+            f, X = calculate_dft_mgn(t,x)
+            f,pha = calculate_dft_phase(t,x)
        
         
-        self.ax.plot(t, y)
+        self.ax.plot(t, x)
         self.ax.set_title(f"Time plot: {type}")
         self.ax.set_ylabel("Voltage [V]")
         self.ax.set_xlabel("Time [s]")
         self.ax.grid(True)
         self.canvas.draw()
+
+        self.ax2.plot(f, X)
+        self.ax2.set_title(f"Spectrum plot Magnitude: {type}")
+        self.ax2.set_ylabel("Voltage [V]")
+        self.ax2.set_xlabel("Frequnecy [Hz]")
+        self.ax2.grid(True)
+        self.canvas2.draw()
+
+        self.ax3.plot(f, pha)
+        self.ax3.set_title(f"Spectrum plot Phase: {type}")
+        self.ax3.set_ylabel("Angle [rad]")
+        self.ax3.set_xlabel("Frequnecy [Hz]")
+        self.ax3.grid(True)
+        self.canvas3.draw()
 
 
 

@@ -15,6 +15,8 @@ if __name__ == "__main__":
     # 4. Uruchamiasz pętlę i czekasz na zamknięcie (X)
     sys.exit(app.exec())
 
+    
+
 
 
 
