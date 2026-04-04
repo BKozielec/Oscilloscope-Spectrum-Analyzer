@@ -5,6 +5,7 @@ from matplotlib.figure import Figure
 from signals import sin, rectangle, triangle, sawtooth, invsawtooth, pulse
 from dft import calculate_dft_mgn,calculate_dft_phase
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.widgets import MultiCursor
 
 class OscilloscopeGUI(QMainWindow):
     def __init__ (self):
@@ -44,6 +45,9 @@ class OscilloscopeGUI(QMainWindow):
         self.spectrum_layout.addWidget(self.canvas3)
         self.toolbar3 = NavigationToolbar(self.canvas3, self)
         self.spectrum_layout.addWidget(self.toolbar3)
+
+        #Cursors 
+        self.multi = MultiCursor(self.canvas, (self.ax, self.ax2, self.ax3), color='r', lw=1, useblit=True)
 
         self.signaltype=QComboBox()
         signals=["Sinusoid","Rectangle","Triangle","Sawtooth","Inverse Sawtooth", "Pulse"]
