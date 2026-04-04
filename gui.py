@@ -4,6 +4,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from signals import sin, rectangle, triangle, sawtooth, invsawtooth, pulse
 from dft import calculate_dft_mgn,calculate_dft_phase
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 class OscilloscopeGUI(QMainWindow):
     def __init__ (self):
@@ -25,18 +26,24 @@ class OscilloscopeGUI(QMainWindow):
         self.canvas=FigureCanvas(self.fig)
         self.ax = self.fig.add_subplot(111)
         self.right_layout.addWidget(self.canvas)
+        self.toolbar1 = NavigationToolbar(self.canvas, self)
+        self.right_layout.addWidget(self.toolbar1)
 
         #Spectrum Plot
         self.fig2=Figure(figsize=(5, 4), dpi=100)
         self.canvas2=FigureCanvas(self.fig2)
         self.ax2 = self.fig2.add_subplot(111)
         self.spectrum_layout.addWidget(self.canvas2)
+        self.toolbar2 = NavigationToolbar(self.canvas2, self)
+        self.spectrum_layout.addWidget(self.toolbar2)
 
         #Spectrum Plot
         self.fig3=Figure(figsize=(5, 4), dpi=100)
         self.canvas3=FigureCanvas(self.fig3)
         self.ax3 = self.fig3.add_subplot(111)
         self.spectrum_layout.addWidget(self.canvas3)
+        self.toolbar3 = NavigationToolbar(self.canvas3, self)
+        self.spectrum_layout.addWidget(self.toolbar3)
 
         self.signaltype=QComboBox()
         signals=["Sinusoid","Rectangle","Triangle","Sawtooth","Inverse Sawtooth", "Pulse"]
@@ -112,6 +119,12 @@ class OscilloscopeGUI(QMainWindow):
         self.btn = QPushButton("Generate signal")
         self.btn.clicked.connect(self.update_plot)
         self.main_layout.addWidget(self.btn)
+
+
+        #Tool bars
+        self.toolbar1 = NavigationToolbar(self.canvas, self)
+        self.toolbar2 = NavigationToolbar(self.canvas2, self)
+        self.toolbar3 = NavigationToolbar(self.canvas3, self)
 
 
 
