@@ -93,7 +93,7 @@ class OscilloscopeGUI(QMainWindow):
         
         self.fs=QDoubleSpinBox()
         self.fs.setRange(0, 1000)
-        self.fs.setValue(100)
+        self.fs.setValue(1000)
         self.fs.setPrefix("Sampling rate: ")
         self.left_layout.addWidget(self.fs)
 
