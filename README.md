@@ -1,7 +1,7 @@
 # Oscilloscope-Spectrum-Analyzer
-Real-time Oscilloscope and Spectrum Analyzer via Serial (COM) Port in Python"
+Real-time audio signal Oscilloscope and Spectrum Analyzer in Python"
 
 MODS:
 
-1. Real-time signal from COM analyzer
+1. Real-time audio signal analyzer
 2. Generated customisable signals symulator
