@@ -1,11 +1,11 @@
-from gui import OscilloscopeGUI
+from gui import Launcher
 from PyQt6.QtWidgets import QApplication
 import sys
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     
-    window = OscilloscopeGUI()
+    window = Launcher()
     
     window.show()
     

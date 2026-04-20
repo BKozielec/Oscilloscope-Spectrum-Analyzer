@@ -6,6 +6,9 @@ from signals import sin, rectangle, triangle, sawtooth, invsawtooth, pulse
 from dft import calculate_dft_mgn,calculate_dft_phase
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.widgets import MultiCursor
+from audio import AudioRecorder
+import numpy as np
+from PyQt6.QtCore import QTimer
 
 class OscilloscopeGUI(QMainWindow):
     def __init__ (self):
@@ -175,7 +178,8 @@ class OscilloscopeGUI(QMainWindow):
             t, x = pulse(a,b,start_pulse,width,start,stop,fs)
             f, X = calculate_dft_mgn(t,x)
             f,pha = calculate_dft_phase(t,x)
-       
+        elif(type=="Real time audio"):
+            print("Audio")
         
         self.ax.plot(t, x)
         self.ax.set_title(f"Time plot: {type}")
@@ -199,5 +203,102 @@ class OscilloscopeGUI(QMainWindow):
         self.canvas3.draw()
 
 
+class Launcher (QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Select mode")
+        self.layout = QVBoxLayout()
+
+        self.btn_sim=QPushButton("Simulation mode")
+        self.btn_sim.clicked.connect(self.open_simulation)
+        self.layout.addWidget(self.btn_sim)
+
+        self.btn_audio=QPushButton("Audio mode")
+        self.btn_audio.clicked.connect(self.open_audio)
+        self.layout.addWidget(self.btn_audio)
+
+        self.setLayout(self.layout)
+        self.sim_window=None
+        self.audio_window=None
+
+    def open_simulation(self):
+        self.sim_window=OscilloscopeGUI()
+        self.sim_window.show()
+        self.close()
+
+    def open_audio(self):
+        print("Audio")
+        self.audio_window=AudioWindow()
+        self.audio_window.show()
+        self.close()
 
 
+        
+
+
+
+
+class AudioWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Real-time Audio")
+        self.setMinimumSize(400, 300)
+
+        self.main_widget=QWidget()
+        self.setCentralWidget(self.main_widget)
+
+        self.layout=QVBoxLayout(self.main_widget)
+
+        self.fig = Figure(figsize=(5, 8))
+        self.canvas = FigureCanvas(self.fig)
+        self.ax_time = self.fig.add_subplot(311)  
+        self.ax_spec = self.fig.add_subplot(312)  
+        self.ax_phase = self.fig.add_subplot(313) 
+        self.layout.addWidget(self.canvas)
+
+        
+        self.recorder = AudioRecorder(rate=44100, chunk=1024)
+        
+        
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_frame)
+        self.timer.start(30)  
+
+
+    def update_frame(self):
+        t, x = self.recorder.get_frame() 
+        x = x - np.mean(x)
+        
+        
+        f, X_mgn = calculate_dft_mgn(t, x)
+        f_pha, X_pha = calculate_dft_phase(t, x) 
+
+        self.ax_time.clear()
+        self.ax_spec.clear()
+        self.ax_phase.clear() 
+        
+       
+        self.ax_time.plot(t, x, color='blue')
+        self.ax_time.set_ylim(-0.5, 0.5) 
+        
+        
+        self.ax_spec.plot(f, X_mgn, color='red')
+        self.ax_spec.set_xlim(0, 5000) 
+        
+      
+        self.ax_phase.plot(f_pha, X_pha, color='green') 
+        self.ax_phase.set_xlim(0, 5000)
+        self.ax_phase.set_ylim(-np.pi, np.pi)
+        
+        self.canvas.draw_idle()
+    def closeEvent(self, event):
+        self.timer.stop()
+        self.recorder.close()
+        event.accept()
+
+
+
+
+
+
+        
